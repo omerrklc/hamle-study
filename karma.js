@@ -33,12 +33,20 @@ function addComment(panel, text) {
   panel.insertBefore(comment, panel.querySelector('.comment-box')); updateKarma(3);
 }
 document.querySelectorAll('.post').forEach((post, index) => {
-  const footer = post.querySelector('.post-footer'); footer.querySelector('span').replaceWith(voteControl(index ? 31 : 24));
+  const footer = post.querySelector('.post-footer');
+  footer.querySelector('span').replaceWith(voteControl(index ? 31 : 24));
+  const commentCount = document.createElement('button');
+  commentCount.className = 'comment-view';
+  commentCount.setAttribute('aria-label', 'View comments');
+  commentCount.innerHTML = `<span>👁</span>${index ? 5 : 8} <em>comments</em>`;
+  footer.querySelector(':scope > span')?.replaceWith(commentCount);
   const launch = document.createElement('button'); launch.className = 'comment-launch'; launch.textContent = 'Comment'; footer.appendChild(launch);
   const panel = document.createElement('div'); panel.className = 'comment-panel';
   panel.innerHTML = '<div class="comment"><span class="comment-avatar">S</span><div class="comment-body"><b>StudyKnight</b><small>8 min ago</small><p>Try improving the knight first; the position will open naturally.</p></div></div><div class="comment-box"><input maxlength="220" placeholder="Add a helpful comment..."><button>Post</button></div><p class="anonymous-note">Votes are anonymous. No one can see who voted.</p>';
   panel.querySelector('.comment-body').appendChild(voteControl(index ? 7 : 18, true)); post.appendChild(panel);
-  launch.onclick = () => panel.classList.toggle('open');
+  const toggleComments = () => panel.classList.toggle('open');
+  launch.onclick = toggleComments;
+  commentCount.onclick = toggleComments;
   panel.querySelector('.comment-box button').onclick = () => { const input = panel.querySelector('input'); if (input.value.trim()) { addComment(panel, input.value.trim()); input.value = ''; } };
 });
 const profileStats = document.querySelector('.profile-stats'); const karmaStat = document.createElement('span'); karmaStat.innerHTML = '<b class="karma-value"></b><small>POINTS</small>'; profileStats.appendChild(karmaStat);
@@ -51,4 +59,5 @@ window.addEventListener('hamle:languagechange', () => {
   document.querySelectorAll('.profile-stats small').forEach(label => {
     if (['POINTS', 'PUAN', 'PUNKTE', 'PUNTI'].includes(label.textContent)) label.textContent = labels.points;
   });
+  document.querySelectorAll('.comment-view em').forEach(label => label.textContent = window.HamleI18n?.t('comments') || 'comments');
 });
