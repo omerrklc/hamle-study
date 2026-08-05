@@ -5,6 +5,7 @@
   const pieceName = { p: 'P', n: 'N', b: 'B', r: 'R', q: 'Q', k: 'K' };
   let selected = null;
   let legalMoves = [];
+  let opening = null;
   const promotionSheet = document.createElement('div');
   promotionSheet.className = 'promotion-sheet';
   document.body.appendChild(promotionSheet);
@@ -12,6 +13,40 @@
   const boardNode = () => document.querySelector('#analysis .board-frame');
   const squareNode = square => boardNode()?.querySelector(`[data-square="${square}"]`);
   const assetFor = piece => `${piece.color}${pieceName[piece.type]}`;
+  const openingLines = {
+    'Italian Game': ['e4', 'e5', 'Nf3', 'Nc6', 'Bc4'],
+    'Sicilian Defense': ['e4', 'c5'],
+    'Queen’s Gambit': ['d4', 'd5', 'c4'],
+    'Queenâ€™s Gambit': ['d4', 'd5', 'c4'],
+    'Ruy Lopez': ['e4', 'e5', 'Nf3', 'Nc6', 'Bb5'],
+    'Caro-Kann': ['e4', 'c6', 'd4', 'd5'],
+    'King’s Indian': ['d4', 'Nf6', 'c4', 'g6'],
+    'Kingâ€™s Indian': ['d4', 'Nf6', 'c4', 'g6']
+  };
+  const notationCopy = () => ({
+    en: { title: 'Move notation', start: 'Starting position' }, tr: { title: 'Hamle notasyonu', start: 'Başlangıç konumu' },
+    de: { title: 'Zugnotation', start: 'Ausgangsstellung' }, fr: { title: 'Notation des coups', start: 'Position initiale' }, it: { title: 'Notazione mosse', start: 'Posizione iniziale' }
+  }[window.HamleI18n?.language() || 'en'] || {});
+
+  function notationPanel() {
+    let panel = document.querySelector('#analysis .notation-panel');
+    if (panel) return panel;
+    const frame = boardNode();
+    if (!frame) return null;
+    const workspace = document.createElement('div'); workspace.className = 'study-workspace';
+    panel = document.createElement('aside'); panel.className = 'notation-panel';
+    frame.before(workspace); workspace.append(frame, panel);
+    return panel;
+  }
+
+  function renderNotation(history) {
+    const panel = notationPanel();
+    if (!panel) return;
+    const t = notationCopy();
+    const rows = [];
+    for (let index = 0; index < history.length; index += 2) rows.push(`<li><b>${index / 2 + 1}.</b><span>${history[index] || ''}</span><span>${history[index + 1] || ''}</span></li>`);
+    panel.innerHTML = `<p>${opening ? `${opening.eco} · ${opening.name}` : t.title}</p><ol>${rows.join('') || `<li class="notation-empty">${t.start}</li>`}</ol>`;
+  }
   const copy = () => {
     const lang = window.HamleI18n?.language() || 'en';
     return {
@@ -48,10 +83,12 @@
     });
     const banner = document.querySelector('#analysis .turn-banner span');
     if (banner) banner.textContent = status();
+    const history = game.history();
     const line = document.querySelector('#analysis .turn-banner b');
-    if (line) line.textContent = game.history().length ? game.history().slice(-1)[0] : 'Study board · starting position';
+    if (line) line.textContent = opening ? `${opening.name} · ${opening.eco}` : (history.length ? history.slice(-1)[0] : 'Study board · starting position');
     const strip = document.querySelector('#analysis .move-strip span');
-    if (strip) strip.innerHTML = game.history().slice(-6).map(move => `<b>${move}</b>`).join('') || '<b>Start a legal line</b>';
+    if (strip) strip.innerHTML = history.slice(-6).map(move => `<b>${move}</b>`).join('') || '<b>Start a legal line</b>';
+    renderNotation(history);
   }
 
   function select(square) {
@@ -92,10 +129,20 @@
   });
 
   document.querySelector('#reset-board')?.addEventListener('click', () => {
-    game.reset(); selected = null; legalMoves = [];
+    game.reset(); selected = null; legalMoves = []; opening = null;
     window.setTimeout(render, 0);
   });
   window.addEventListener('hamle:languagechange', render);
-  window.resetStudyChess = () => { game.reset(); selected = null; legalMoves = []; render(); };
+  window.resetStudyChess = () => { game.reset(); selected = null; legalMoves = []; opening = null; render(); };
+  window.loadStudyOpening = (name, eco) => {
+    const line = openingLines[name];
+    if (!line) return;
+    game.reset();
+    line.forEach(move => game.move(move));
+    opening = { name, eco };
+    selected = null;
+    legalMoves = [];
+    render();
+  };
   render();
 })();
