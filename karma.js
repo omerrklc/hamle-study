@@ -38,7 +38,7 @@ document.querySelectorAll('.post').forEach((post, index) => {
   const commentCount = document.createElement('button');
   commentCount.className = 'comment-view';
   commentCount.setAttribute('aria-label', 'View comments');
-  commentCount.innerHTML = `<span>👁</span>${index ? 5 : 8} <em>comments</em>`;
+  commentCount.innerHTML = `<span aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg></span>${index ? 5 : 8} <em>comments</em>`;
   footer.querySelector(':scope > span')?.replaceWith(commentCount);
   const launch = document.createElement('button'); launch.className = 'comment-launch'; launch.textContent = 'Comment'; footer.appendChild(launch);
   const panel = document.createElement('div'); panel.className = 'comment-panel';
