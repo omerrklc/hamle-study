@@ -23,11 +23,11 @@ document.querySelectorAll('#ask-button, #ask-button-2').forEach(button => button
 document.querySelector('.close-modal')?.addEventListener('click', () => modal.classList.remove('open'));
 document.querySelector('.submit-question')?.addEventListener('click', () => { modal.classList.remove('open'); showToast(say('shared')); });
 const chatCopy = {
-  en:{online:'Online now',back:'Back',placeholder:'Write a message…',empty:'Start the conversation.',today:'Today'},
-  tr:{online:'Şimdi çevrimiçi',back:'Geri',placeholder:'Mesaj yaz…',empty:'Sohbete bir mesajla başla.',today:'Bugün'},
-  de:{online:'Jetzt online',back:'Zurück',placeholder:'Nachricht schreiben…',empty:'Starte die Unterhaltung.',today:'Heute'},
-  fr:{online:'En ligne maintenant',back:'Retour',placeholder:'Écrire un message…',empty:'Commencez la conversation.',today:'Aujourd’hui'},
-  it:{online:'Online ora',back:'Indietro',placeholder:'Scrivi un messaggio…',empty:'Inizia la conversazione.',today:'Oggi'}
+  en:{online:'Online now',back:'Back',placeholder:'Write a message…',empty:'Start the conversation.',today:'Today',newMessage:'New message',choose:'Choose a player',close:'Close'},
+  tr:{online:'Şimdi çevrimiçi',back:'Geri',placeholder:'Mesaj yaz…',empty:'Sohbete bir mesajla başla.',today:'Bugün',newMessage:'Yeni mesaj',choose:'Oyuncu seç',close:'Kapat'},
+  de:{online:'Jetzt online',back:'Zurück',placeholder:'Nachricht schreiben…',empty:'Starte die Unterhaltung.',today:'Heute',newMessage:'Neue Nachricht',choose:'Spieler auswählen',close:'Schließen'},
+  fr:{online:'En ligne maintenant',back:'Retour',placeholder:'Écrire un message…',empty:'Commencez la conversation.',today:'Aujourd’hui',newMessage:'Nouveau message',choose:'Choisir un joueur',close:'Fermer'},
+  it:{online:'Online ora',back:'Indietro',placeholder:'Scrivi un messaggio…',empty:'Inizia la conversazione.',today:'Oggi',newMessage:'Nuovo messaggio',choose:'Scegli un giocatore',close:'Chiudi'}
 };
 const chatLanguage = () => chatCopy[window.HamleI18n?.language() || 'en'] || chatCopy.en;
 const chat = document.createElement('section');
@@ -35,6 +35,22 @@ chat.className = 'chat-panel';
 chat.setAttribute('aria-live','polite');
 document.querySelector('.app-shell').appendChild(chat);
 let activeChat = null;
+const recipientSheet = document.createElement('div');
+recipientSheet.className = 'recipient-sheet';
+document.body.appendChild(recipientSheet);
+function openChat(name) { activeChat = name; renderChat(); chat.classList.add('open'); }
+function showRecipientPicker() {
+  const copy = chatLanguage();
+  recipientSheet.innerHTML = `<section class="recipient-card"><h2>${copy.choose}</h2><button data-recipient="Deniz"><span>D</span>Deniz</button><button data-recipient="Arda"><span>A</span>Arda K.</button><button class="recipient-close">${copy.close}</button></section>`;
+  recipientSheet.classList.add('open');
+  recipientSheet.querySelectorAll('[data-recipient]').forEach(button => button.onclick = () => { recipientSheet.classList.remove('open'); openChat(button.dataset.recipient); });
+  recipientSheet.querySelector('.recipient-close').onclick = () => recipientSheet.classList.remove('open');
+}
+const newMessageButton = document.createElement('button');
+newMessageButton.className = 'new-message';
+newMessageButton.innerHTML = '<b>＋</b><span></span>';
+document.querySelector('#messages .section-heading').after(newMessageButton);
+newMessageButton.onclick = showRecipientPicker;
 const storedMessages = () => JSON.parse(localStorage.getItem('hamle-messages') || '{}');
 const saveMessages = value => localStorage.setItem('hamle-messages', JSON.stringify(value));
 function renderChat() {
@@ -54,5 +70,5 @@ function renderChat() {
     const all = storedMessages(); all[activeChat] = [...(all[activeChat] || starter), {from:'me', text:value}]; saveMessages(all); renderChat();
   };
 }
-document.querySelectorAll('.conversation').forEach(item => item.addEventListener('click', () => { activeChat = item.dataset.name; renderChat(); chat.classList.add('open'); }));
-window.addEventListener('hamle:languagechange', () => { if (activeChat) renderChat(); });
+document.querySelectorAll('.conversation').forEach(item => item.addEventListener('click', () => openChat(item.dataset.name)));
+window.addEventListener('hamle:languagechange', () => { newMessageButton.querySelector('span').textContent = chatLanguage().newMessage; if (activeChat) renderChat(); });
