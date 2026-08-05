@@ -6,6 +6,8 @@
   let selected = null;
   let legalMoves = [];
   let opening = null;
+  let timeline = [];
+  let cursor = 0;
   const promotionSheet = document.createElement('div');
   promotionSheet.className = 'promotion-sheet';
   document.body.appendChild(promotionSheet);
@@ -66,6 +68,11 @@
     return game.turn() === 'w' ? t.white : t.black;
   }
 
+  function rebuildPosition() {
+    game.reset();
+    timeline.slice(0, cursor).forEach(move => game.move(move));
+  }
+
   function render() {
     const frame = boardNode();
     if (!frame) return;
@@ -89,6 +96,10 @@
     const strip = document.querySelector('#analysis .move-strip span');
     if (strip) strip.innerHTML = history.slice(-6).map(move => `<b>${move}</b>`).join('') || '<b>Start a legal line</b>';
     renderNotation(history);
+    const back = document.querySelector('#analysis .move-back');
+    const forward = document.querySelector('#analysis .move-forward');
+    if (back) back.disabled = cursor === 0;
+    if (forward) forward.disabled = cursor >= timeline.length;
   }
 
   function select(square) {
@@ -100,7 +111,10 @@
   }
 
   function finishMove(move) {
-    game.move(move);
+    timeline = timeline.slice(0, cursor);
+    timeline.push(move);
+    cursor += 1;
+    rebuildPosition();
     selected = null;
     legalMoves = [];
     render();
@@ -129,16 +143,29 @@
   });
 
   document.querySelector('#reset-board')?.addEventListener('click', () => {
-    game.reset(); selected = null; legalMoves = []; opening = null;
+    game.reset(); selected = null; legalMoves = []; opening = null; timeline = []; cursor = 0;
     window.setTimeout(render, 0);
   });
+  document.querySelector('#analysis .move-back')?.addEventListener('click', () => {
+    if (!cursor) return;
+    cursor -= 1; selected = null; legalMoves = []; rebuildPosition(); render();
+  });
+  document.querySelector('#analysis .move-forward')?.addEventListener('click', () => {
+    if (cursor >= timeline.length) return;
+    cursor += 1; selected = null; legalMoves = []; rebuildPosition(); render();
+  });
   window.addEventListener('hamle:languagechange', render);
-  window.resetStudyChess = () => { game.reset(); selected = null; legalMoves = []; opening = null; render(); };
+  window.resetStudyChess = () => { game.reset(); selected = null; legalMoves = []; opening = null; timeline = []; cursor = 0; render(); };
   window.loadStudyOpening = (name, eco) => {
     const line = openingLines[name];
     if (!line) return;
     game.reset();
-    line.forEach(move => game.move(move));
+    timeline = line.map(move => {
+      const played = game.move(move);
+      return { from: played.from, to: played.to, promotion: played.promotion };
+    });
+    cursor = timeline.length;
+    rebuildPosition();
     opening = { name, eco };
     selected = null;
     legalMoves = [];
