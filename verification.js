@@ -1,0 +1,8 @@
+const verificationModal = document.createElement('div');
+verificationModal.className = 'verification-modal';
+verificationModal.innerHTML = '<section class="verification-sheet"><button class="verification-close">&times;</button><h2>Verify your chess rating</h2><p>Connect a public chess profile to add a verified badge to your ELO. We only display the account name and rating you choose to share.</p><button class="account-choice" data-service="Chess.com"><i>♛</i><span><strong>Chess.com</strong><small>Connect your public profile</small></span><b>›</b></button><button class="account-choice" data-service="Lichess"><i>♞</i><span><strong>Lichess</strong><small>Connect your public profile</small></span><b>›</b></button><div class="verified-status"><span>✓</span> Lichess account currently verified</div></section>';
+document.body.appendChild(verificationModal);
+document.querySelector('#account-connect').onclick = () => verificationModal.classList.add('open');
+verificationModal.querySelector('.verification-close').onclick = () => verificationModal.classList.remove('open');
+verificationModal.querySelectorAll('.account-choice').forEach(choice => choice.onclick = () => { verificationModal.classList.remove('open'); document.querySelector('#toast').textContent = `${choice.dataset.service} connection flow is ready`; document.querySelector('#toast').classList.add('show'); setTimeout(() => document.querySelector('#toast').classList.remove('show'), 2300); });
+document.querySelectorAll('.player-title h2').forEach((name, index) => { if (index === 0) name.insertAdjacentHTML('beforeend', ' <span class="unverified-label">UNVERIFIED</span>'); });

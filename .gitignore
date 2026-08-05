@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.runtime/
+.tmp-edge-check/
+.tmp-chrome-check/
+.pnpm-store/
+src/
+*.tsbuildinfo

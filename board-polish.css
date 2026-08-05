@@ -1,0 +1,9 @@
+/* Classic square board: always a true 8 by 8 chessboard. */
+.proper-board{width:100%;aspect-ratio:1;grid-template-rows:repeat(8,1fr)}
+.analysis-tools{display:none!important}
+.turn-banner .quick-flip{margin-left:auto;border:1px solid #d8e1d5;background:#fff;border-radius:7px;width:27px;height:25px;color:#4e6e51;font-size:14px}
+.turn-banner small{margin-left:0}
+.proper-board.flipped .chess-piece,.proper-board.flipped .rank-label,.proper-board.flipped .file-label{transform:rotate(180deg)}
+.proper-board.flipped .rank-label{left:auto;right:3px;bottom:2px;top:auto}.proper-board.flipped .file-label{right:auto;left:3px;top:2px;bottom:auto}
+.proper-board.flipped .board-square{cursor:pointer}
+body.dark .turn-banner .quick-flip{background:#26382b;border-color:#405144;color:#d5ed78}
