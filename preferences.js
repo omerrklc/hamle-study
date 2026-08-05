@@ -42,6 +42,7 @@ function setLanguage(language) {
     const label = item.querySelector('small');
     if (label) label.textContent = text.nav[item.dataset.target] || item.dataset.target;
   });
+  window.dispatchEvent(new CustomEvent('hamle:languagechange', { detail: { language } }));
   localStorage.setItem('hamle-language', language);
 }
 
