@@ -51,23 +51,43 @@ newMessageButton.className = 'new-message';
 newMessageButton.innerHTML = '<b>＋</b><span></span>';
 document.querySelector('#messages .section-heading').after(newMessageButton);
 newMessageButton.onclick = showRecipientPicker;
-const storedMessages = () => JSON.parse(localStorage.getItem('hamle-messages') || '{}');
-const saveMessages = value => localStorage.setItem('hamle-messages', JSON.stringify(value));
+const storedMessages = () => JSON.parse(localStorage.getItem('hamle-chat-threads-v2') || '{}');
+const saveMessages = value => localStorage.setItem('hamle-chat-threads-v2', JSON.stringify(value));
+const openingThread = name => {
+  const lang = window.HamleI18n?.language() || 'en';
+  const thread = {
+    en: name === 'Deniz' ? ['Hi Ömer! I saw you are studying the Italian Game.', 'Do you have a plan for the Italian Game?'] : ['Thanks for the analysis!', 'Would you like to review the critical position together?'],
+    tr: name === 'Deniz' ? ['Selam Ömer! İtalyan Açılışı çalıştığını gördüm.', 'İtalyan Açılışı için bir planın var mı?'] : ['Analiz için teşekkürler!', 'Kritik pozisyonu birlikte incelemek ister misin?'],
+    de: name === 'Deniz' ? ['Hallo Ömer! Ich habe gesehen, dass du die Italienische Partie studierst.', 'Hast du einen Plan für die Italienische Partie?'] : ['Danke für die Analyse!', 'Möchtest du die kritische Stellung zusammen ansehen?'],
+    fr: name === 'Deniz' ? ['Salut Ömer ! J’ai vu que tu étudies l’Italienne.', 'As-tu un plan pour l’Italienne ?'] : ['Merci pour l’analyse !', 'Veux-tu revoir la position critique ensemble ?'],
+    it: name === 'Deniz' ? ['Ciao Ömer! Ho visto che studi l’Italiana.', 'Hai un piano per l’Italiana?'] : ['Grazie per l’analisi!', 'Vuoi rivedere insieme la posizione critica?']
+  };
+  return (thread[lang] || thread.en).map(text => ({ from: 'them', text }));
+};
+const automaticReply = name => ({
+  en: name === 'Deniz' ? 'Great — I’m looking at the board now.' : 'Sounds good. I’m ready when you are.',
+  tr: name === 'Deniz' ? 'Harika — şimdi tahtaya bakıyorum.' : 'Olur. Hazır olduğunda buradayım.',
+  de: name === 'Deniz' ? 'Super — ich schaue mir das Brett jetzt an.' : 'Klingt gut. Ich bin bereit, wenn du es bist.',
+  fr: name === 'Deniz' ? 'Parfait — je regarde l’échiquier maintenant.' : 'D’accord. Je suis prêt quand tu l’es.',
+  it: name === 'Deniz' ? 'Ottimo — sto guardando la scacchiera ora.' : 'Va bene. Sono pronto quando lo sei.'
+}[window.HamleI18n?.language() || 'en'] || 'Sounds good.');
 function renderChat() {
   if (!activeChat) return;
   const copy = chatLanguage();
   const history = storedMessages()[activeChat] || [];
-  const starter = activeChat === 'Deniz' ? [
-    {from:'them', text: window.HamleI18n?.t('msgOne') || 'Do you have a plan for the Italian Game?'}
-  ] : [{from:'them', text: window.HamleI18n?.t('msgTwo') || 'Thanks for the analysis!'}];
-  const entries = history.length ? history : starter;
+  const entries = [...openingThread(activeChat), ...history];
   chat.innerHTML = `<header class="chat-head"><button class="chat-back" aria-label="${copy.back}">‹</button><span class="chat-avatar ${activeChat === 'Deniz' ? 'deniz' : ''}">${activeChat[0]}</span><span class="chat-person"><strong>${activeChat}</strong><small>${copy.online}</small></span></header><div class="chat-messages"><p class="chat-date">${copy.today}</p>${entries.map(item => `<p class="chat-bubble ${item.from === 'me' ? 'me' : 'them'}"></p>`).join('')}</div><form class="chat-compose"><input maxlength="500" autocomplete="off" aria-label="${copy.placeholder}" placeholder="${copy.placeholder}"><button class="chat-send" aria-label="Send">↑</button></form>`;
   chat.querySelectorAll('.chat-bubble').forEach((bubble, index) => bubble.textContent = entries[index].text);
   const messages = chat.querySelector('.chat-messages'); messages.scrollTop = messages.scrollHeight;
   chat.querySelector('.chat-back').onclick = () => { chat.classList.remove('open'); activeChat = null; };
   chat.querySelector('.chat-compose').onsubmit = event => {
     event.preventDefault(); const input = event.currentTarget.querySelector('input'); const value = input.value.trim(); if (!value) return;
-    const all = storedMessages(); all[activeChat] = [...(all[activeChat] || starter), {from:'me', text:value}]; saveMessages(all); renderChat();
+    const recipient = activeChat;
+    const all = storedMessages(); all[recipient] = [...(all[recipient] || []), {from:'me', text:value}]; saveMessages(all); renderChat();
+    window.setTimeout(() => {
+      const updated = storedMessages(); updated[recipient] = [...(updated[recipient] || []), {from:'them', text:automaticReply(recipient)}]; saveMessages(updated);
+      if (activeChat === recipient) renderChat();
+    }, 700);
   };
 }
 document.querySelectorAll('.conversation').forEach(item => item.addEventListener('click', () => openChat(item.dataset.name)));
