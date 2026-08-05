@@ -39,7 +39,7 @@ document.querySelectorAll('.post').forEach((post, index) => {
   commentCount.className = 'comment-view';
   commentCount.setAttribute('aria-label', 'View comments');
   commentCount.innerHTML = `<span aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg></span>${index ? 5 : 8} <em>comments</em>`;
-  footer.querySelector(':scope > span')?.replaceWith(commentCount);
+  footer.querySelector(':scope > span:not(.vote-group)')?.replaceWith(commentCount);
   const launch = document.createElement('button'); launch.className = 'comment-launch'; launch.textContent = 'Comment'; footer.appendChild(launch);
   const panel = document.createElement('div'); panel.className = 'comment-panel';
   panel.innerHTML = '<div class="comment"><span class="comment-avatar">S</span><div class="comment-body"><b>StudyKnight</b><small>8 min ago</small><p>Try improving the knight first; the position will open naturally.</p></div></div><div class="comment-box"><input maxlength="220" placeholder="Add a helpful comment..."><button>Post</button></div><p class="anonymous-note">Votes are anonymous. No one can see who voted.</p>';
