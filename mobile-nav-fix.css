@@ -1,0 +1,14 @@
+@media (max-width: 600px) {
+  html, body { min-height: 100%; overflow-x: hidden; }
+  .app-shell { min-height: 100dvh; padding-bottom: 96px; }
+  .bottom-nav {
+    position: fixed;
+    z-index: 40;
+    bottom: 0;
+    left: 50%;
+    width: min(100%, 440px);
+    transform: translateX(-50%);
+    border-radius: 0;
+    padding-bottom: max(0px, env(safe-area-inset-bottom));
+  }
+}
