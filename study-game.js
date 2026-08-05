@@ -41,13 +41,22 @@
     return panel;
   }
 
+  function timelineNotation() {
+    const replay = new Chess();
+    return timeline.map(move => replay.move(move).san);
+  }
+
   function renderNotation(history) {
     const panel = notationPanel();
     if (!panel) return;
     const t = notationCopy();
     const rows = [];
-    for (let index = 0; index < history.length; index += 2) rows.push(`<li><b>${index / 2 + 1}.</b><span>${history[index] || ''}</span><span>${history[index + 1] || ''}</span></li>`);
+    for (let index = 0; index < history.length; index += 2) rows.push(`<li><b>${index / 2 + 1}.</b><button class="notation-move ${cursor === index + 1 ? 'active' : ''}" data-ply="${index + 1}">${history[index] || ''}</button><button class="notation-move ${cursor === index + 2 ? 'active' : ''}" data-ply="${index + 2}" ${history[index + 1] ? '' : 'disabled'}>${history[index + 1] || ''}</button></li>`);
     panel.innerHTML = `<p>${opening ? `${opening.eco} · ${opening.name}` : t.title}</p><ol>${rows.join('') || `<li class="notation-empty">${t.start}</li>`}</ol>`;
+    panel.querySelectorAll('.notation-move').forEach(button => button.onclick = () => {
+      cursor = Number(button.dataset.ply);
+      selected = null; legalMoves = []; rebuildPosition(); render();
+    });
   }
   const copy = () => {
     const lang = window.HamleI18n?.language() || 'en';
@@ -95,7 +104,7 @@
     if (line) line.textContent = opening ? `${opening.name} · ${opening.eco}` : (history.length ? history.slice(-1)[0] : 'Study board · starting position');
     const strip = document.querySelector('#analysis .move-strip span');
     if (strip) strip.innerHTML = history.slice(-6).map(move => `<b>${move}</b>`).join('') || '<b>Start a legal line</b>';
-    renderNotation(history);
+    renderNotation(timelineNotation());
     const back = document.querySelector('#analysis .move-back');
     const forward = document.querySelector('#analysis .move-forward');
     if (back) back.disabled = cursor === 0;
