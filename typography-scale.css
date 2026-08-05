@@ -1,0 +1,72 @@
+/* Mobile-first type scale: keeps compact chess data readable without flattening hierarchy. */
+:root {
+  --text-xs: 10px;
+  --text-sm: 12px;
+  --text-md: 14px;
+}
+
+/* Global navigation and primary actions */
+.icon-button { font-size: 27px; }
+.nav-item { font-size: 22px; }
+.nav-item small { font-size: var(--text-xs); }
+.eyebrow { font-size: 11px; }
+.filter { font-size: var(--text-sm); }
+.card-tag, .chips span, .swipe-hint { font-size: var(--text-xs); }
+.player-title p, .post-head strong, .conversation small { font-size: var(--text-xs); }
+.post-head span, .profile-stats small { font-size: 10px; }
+.post h3, .bio { font-size: var(--text-md); }
+.position-card p, .post-footer { font-size: var(--text-xs); }
+.position-card b { font-size: var(--text-xs); }
+
+/* Study board and move controls */
+.study-tabs button { font-size: var(--text-sm); }
+.turn-banner { font-size: var(--text-xs); }
+.turn-banner b { font-size: var(--text-sm); }
+.rank-label, .file-label, .fixed-rank, .fixed-file { font-size: 9px; }
+.move-strip button { font-size: 25px; }
+.move-strip span { font-size: 11px; }
+.analysis-tools button, .ask-analysis { font-size: var(--text-xs); }
+.coach-card > span { font-size: 25px; }
+.coach-card p, .coach-card button, .library-intro { font-size: var(--text-sm); }
+.opening-card small, .opening-card p { font-size: 10px; }
+.opening-card h3 { font-size: var(--text-sm); }
+
+/* Positions and game history */
+.position-filters button, .position-card-head span, .position-card-head b,
+.side-choice button { font-size: var(--text-xs); }
+.position-copy p, .position-match b, .position-match > i,
+.position-action { font-size: var(--text-sm); }
+.position-match small { font-size: var(--text-xs); }
+.avatar { font-size: var(--text-xs); }
+.game-result-head { font-size: 10px; }
+.result-summary small, .result-players small { font-size: var(--text-xs); }
+.result-players b, .game-result p, .analyse-game { font-size: var(--text-sm); }
+
+/* Sheets, dialogs and supporting content */
+.modal label, .modal textarea, .modal-options button, .submit-question,
+.overlay-card > p, .search-input, .search-result, .notice,
+.report-row button, .notification-item, .invite-sheet > p,
+.player-invite, .verification-sheet > p, .account-choice strong,
+.verified-status, .match-note, .match-players, .match-status {
+  font-size: var(--text-sm);
+}
+.filter-grid button, .search-result small, .notification-item small,
+.mentor-badge, .reputation-line, .player-invite span, .player-invite b,
+.account-connect small, .account-choice small, .match-kicker,
+.match-players b, .match-players i, .match-resign {
+  font-size: var(--text-xs);
+}
+.account-connect strong { font-size: var(--text-sm); }
+.account-connect > span:first-child { font-size: 21px; }
+.verification-badge { font-size: 11px; }
+.unverified-label { font-size: var(--text-xs); }
+.vote-score, .comment-body b, .comment-body small, .comment-body p,
+.comment-box input, .comment-box button, .karma-toast { font-size: var(--text-xs); }
+.vote-button { width: 26px; height: 26px; border-radius: 7px; font-size: 15px; }
+.comment-votes .vote-button { width: 23px; height: 23px; font-size: 13px; }
+.karma-chip, .anonymous-note { font-size: 9px; }
+
+@media (max-width: 370px) {
+  .section-heading h1 { font-size: 33px; }
+  .match-players { font-size: 11px; }
+}
