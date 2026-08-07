@@ -90,4 +90,5 @@ document.querySelectorAll('.analyse-game').forEach(button => button.onclick = ()
   document.querySelector('.study-tabs button[data-study="board"]').click();
   document.querySelector('.turn-banner b').textContent = `Game review · ${button.dataset.game}`;
   document.querySelector('.turn-banner span').textContent = 'ANALYSIS MODE';
+  window.enterStudyFocus?.();
 });

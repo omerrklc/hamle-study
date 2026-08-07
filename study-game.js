@@ -15,6 +15,26 @@
   const boardNode = () => document.querySelector('#analysis .board-frame');
   const squareNode = square => boardNode()?.querySelector(`[data-square="${square}"]`);
   const assetFor = piece => `${piece.color}${pieceName[piece.type]}`;
+  const focusCopy = () => ({
+    en: 'Exit focus', tr: 'Odaktan çık', de: 'Fokus verlassen', fr: 'Quitter le focus', it: 'Esci dalla modalità focus'
+  }[window.HamleI18n?.language() || 'en'] || 'Exit focus');
+
+  function focusButton() {
+    let button = document.querySelector('#analysis .study-focus-exit');
+    if (button) return button;
+    button = document.createElement('button');
+    button.className = 'study-focus-exit';
+    button.type = 'button';
+    button.innerHTML = '<span aria-hidden="true">×</span><b></b>';
+    button.addEventListener('click', () => document.body.classList.remove('study-focus-mode'));
+    document.querySelector('#analysis')?.appendChild(button);
+    return button;
+  }
+
+  function enterFocusMode() {
+    document.body.classList.add('study-focus-mode');
+    focusButton();
+  }
   const openingLines = {
     'Italian Game': ['e4', 'e5', 'Nf3', 'Nc6', 'Bc4'],
     'Sicilian Defense': ['e4', 'c5'],
@@ -109,6 +129,11 @@
     const forward = document.querySelector('#analysis .move-forward');
     if (back) back.disabled = cursor === 0;
     if (forward) forward.disabled = cursor >= timeline.length;
+    const exit = focusButton();
+    if (exit) {
+      exit.querySelector('b').textContent = focusCopy();
+      exit.setAttribute('aria-label', focusCopy());
+    }
   }
 
   function select(square) {
@@ -126,6 +151,7 @@
     rebuildPosition();
     selected = null;
     legalMoves = [];
+    enterFocusMode();
     render();
   }
 
@@ -164,6 +190,13 @@
     cursor += 1; selected = null; legalMoves = []; rebuildPosition(); render();
   });
   window.addEventListener('hamle:languagechange', render);
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') document.body.classList.remove('study-focus-mode');
+  });
+  document.addEventListener('click', event => {
+    const navItem = event.target.closest('.bottom-nav .nav-item');
+    if (navItem && navItem.dataset.target !== 'analysis') document.body.classList.remove('study-focus-mode');
+  });
   window.resetStudyChess = () => { game.reset(); selected = null; legalMoves = []; opening = null; timeline = []; cursor = 0; render(); };
   window.loadStudyOpening = (name, eco) => {
     const line = openingLines[name];
@@ -178,7 +211,9 @@
     opening = { name, eco };
     selected = null;
     legalMoves = [];
+    enterFocusMode();
     render();
   };
+  window.enterStudyFocus = enterFocusMode;
   render();
 })();
